@@ -23,7 +23,7 @@ import GroupMembers from './pages/GroupMembers';
 import InviteMember from './pages/InviteMember';
 import Notification from './pages/Notification';
 import CitySearch from './pages/Event/CitySearch';
-import Schedule from './pages/Schedule/Schedule';
+import Schedular from './pages/Schedule/Schedular';
 import ScheduleDetail from './pages/Schedule/ScheduleDetail';
 import AutoSearchPage from './pages/Schedule/AutoCompleteSearch';
 import RecommendedSearchPage from './pages/Schedule/RecommendationSearch';
@@ -69,7 +69,7 @@ const App = () => {
           <Route path="/notifications" element={<Notification />} />
           <Route path="/citysearch" element={<CitySearch />} />
           <Route path="/calendar" element={<Calendar />} />
-          <Route path="/schedule/:eventId" element={<Schedule />} />
+          <Route path="/schedular/:eventId" element={<Schedular />} />
           <Route path="/scheduledetail" element={<ScheduleDetail />} />
           <Route path="/autosearch/:eventId" element={<AutoSearchPage />} />
           <Route path="/recommended/:eventId" element={<RecommendedSearchPage />} />

@@ -44,7 +44,7 @@ const GroupMembers = () => {
     };
 
     const handleAddSchedule = (eventId) => {
-        navigate(`/schedule/${eventId}`);
+        navigate(`/schedular/${eventId}`);
     };
 
     if (loading) {

@@ -1,3 +1,30 @@
+/* 모달 오버레이 스타일 */
+.modal-overlay-schedule {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75); /* 반투명한 검은 배경 */
+    z-index: 1000; /* 모달이 다른 요소들 위에 나타나도록 */
+}
+
+/* 모달 콘텐츠 스타일 */
+.modal-content {
+    position: absolute;
+    top: 50%; /* 화면의 중앙에 위치 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 완벽하게 가운데 정렬 */
+    background-color: #fff; /* 흰색 배경 */
+    padding: 20px;
+    width: 90%; /* 기본적으로 화면의 90% 너비 */
+    max-width: 400px; /* 최대 너비 */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    z-index: 1001; /* 오버레이 위에 위치 */
+    outline: none; /* 포커스 시 테두리 제거 */
+}
+
 /* 기본 설정 */
 body {
     font-family: 'Arial', sans-serif;
@@ -12,7 +39,7 @@ body {
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    height: 100vh; /* 화면 전체 높이 사용 */
+    height: 100%; /* 모달 내부 높이 사용 */
     justify-content: space-between; /* 자식 요소를 위와 아래로 분리하여 저장 버튼을 아래로 고정 */
 }
 
@@ -68,8 +95,8 @@ button {
     color: #065A91; /* 글자 색상 */
     border-radius: 8px; /* 둥글게 */
     cursor: pointer; /* 커서 포인터로 변경 */
-    margin-left: 10px; /* Voyage 텍스트와의 간격 */
-    margin-right: 10px; /* Voyage 텍스트와의 간격 */
+    margin-left: 10px; /* 버튼 간격 */
+    margin-right: 10px; /* 버튼 간격 */
 }
 
 button:hover {
@@ -85,5 +112,5 @@ button:hover {
     border: none; /* 저장 버튼은 테두리 없음 */
     border-radius: 8px;
     font-size: 16px;
+    cursor: pointer;
 }
-

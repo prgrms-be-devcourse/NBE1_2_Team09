@@ -79,13 +79,28 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
                 visitStartTime: startTime,
                 visitEndTime: endTime,
             };
-            console.log("저장내용:",eventLocationReq)
             const eventLocationResponse = await axios.post(`/events/${eventId}/locations`, eventLocationReq);
-            console.log("이벤트와 장소:", eventLocationResponse.data);
             alert("일정이 저장되었습니다.");
 
-            navigate(`/schedular/${eventId}`);
+            onClose()
+            //navigate(`/schedular/${eventId}`);
             sessionStorage.removeItem('locationData');
+
+             // 여기서 웹소켓을 통해 다른 클라이언트에게 알리기
+            const savedData = {
+                pinId: eventLocationResponse.data.pinId, // 응답에서 pinId 가져오기
+                eventId: eventId,
+                locationId: locationId,
+                description: description,
+                visitStart: startTime,
+                visitEnd: endTime,
+            };
+            if (stompClient && stompClient.connected) {
+                stompClient.publish({
+                  destination: '/app/savedCell',
+                  body: JSON.stringify(savedData),
+                });
+              }
 
         } catch (error) {
             console.error("오류 발생:", error);
@@ -96,7 +111,6 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
     const handleColorChange = (color) => {
         setColor(color.hex); // 선택된 색상 저장
     };
-
 
     return (
         <div className="schedule-detail">
@@ -138,8 +152,13 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
             <button className="save-button" onClick={handleSubmit}>저장</button>
 
             {/* 모달 컴포넌트에 eventId를 prop으로 전달 */}
-            <Modal isOpen={isModalOpen} onRequestClose={handleCloseModal}  className="modal-content"
-          overlayClassName="modal-overlay">
+            <Modal
+        isOpen={isModalOpen}
+        onRequestClose={() => {}}
+        shouldCloseOnOverlayClick={false} // 배경 클릭 비활성화
+        className="modal-content"
+        overlayClassName="modal-overlay"
+    >
                 <AutoCompleteSearch eventId={eventId} onClose={handleCloseModal} />
             </Modal>
         </div>

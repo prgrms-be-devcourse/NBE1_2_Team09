@@ -12,7 +12,6 @@ function RecommendationSearch({eventId,onClose}) {
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [selectedPlaceId, setSelectedPlaceId] = useState(null);
     const [isPlaceDetailOpen, setIsPlaceDetailOpen] = useState(false);
-    const navigate = useNavigate();
 
     const fetchRecommendations = useCallback((type, sort) => {
         if (!eventId) {
@@ -167,7 +166,7 @@ function RecommendationSearch({eventId,onClose}) {
 
             {/* PlaceDetail 모달 */}
             {selectedPlaceId && (
-                <Modal isOpen={isPlaceDetailOpen} onRequestClose={handleClosePlaceDetail} className="modal-content" overlayClassName="modal-overlay">
+                <Modal isOpen={isPlaceDetailOpen} onRequestClose={handleClosePlaceDetail}  shouldCloseOnOverlayClick={false} className="modal-content" overlayClassName="modal-overlay">
                     <PlaceDetail placeId={selectedPlaceId} onClose={handleClosePlaceDetail} />
                 </Modal>
             )}

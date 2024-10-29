@@ -17,9 +17,7 @@ const Schedular = () => {
   const [initialDate, setInitialDate] = useState(null);
   const [validRange, setValidRange] = useState({});
   const [numberOfDays, setNumberOfDays] = useState(7);
-
-  const { selectedCell, deletedCell, stompClient } = useNotification();
-
+  const { selectedCell, deletedCell, savedCell, stompClient } = useNotification();
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
@@ -45,9 +43,9 @@ const Schedular = () => {
 
         const locationResponse = await fetch(`/events/${eventId}/locations`);
         const locationData = await locationResponse.json();
-
         if (locationData) {
           const loadedEvents = locationData.map(location => ({
+            id: location.pinId,
             title: location.description,
             start: DateTime.fromISO(location.visitStartTime).toISO(),
             end: DateTime.fromISO(location.visitEndTime).toISO(),
@@ -78,6 +76,14 @@ const Schedular = () => {
     }
   }, [deletedCell]);
 
+  // WebSocket으로 저장할 셀 데이터 받기
+  useEffect(() => {
+    if (savedCell) {
+      console.log('저장 셀 정보:', savedCell);
+      handleSavedSelection(savedCell);
+    }
+  }, [savedCell]);
+
   const handleReceivedSelection = (cellData) => {
     const { startTime, endTime } = cellData;
 
@@ -91,7 +97,6 @@ const Schedular = () => {
     };
 
     setEvents((prevEvents) => [...prevEvents, newEvent]);
-    console.log('추가된 이벤트:', newEvent);
   };
 
   const handleRemoveSelection = (cellData) => {
@@ -102,11 +107,28 @@ const Schedular = () => {
         const eventStartWithoutTZ = event.start.split('.')[0];
         return eventStartWithoutTZ !== startTime;
       });
-      console.log('업데이트된 이벤트:', updatedEvents);
       return updatedEvents;
     });
-    console.log('삭제된 셀에 대한 이벤트가 제거되었습니다:', cellData);
   };
+
+  const handleSavedSelection = (savedCell) => {
+    const newEvent = {
+        id: savedCell.pinId,
+        title: savedCell.description,
+        start: DateTime.fromISO(savedCell.visitStart).toISO(),
+        end: DateTime.fromISO(savedCell.visitEnd).toISO(),
+    };
+
+    setEvents((prevEvents) => {
+        const filteredEvents = prevEvents.filter(event => {
+            const eventStartWithoutTZ = event.start.split('.')[0];
+            const newEventStartWithoutTZ = newEvent.start.split('.')[0];
+            return eventStartWithoutTZ !== newEventStartWithoutTZ;
+        });
+
+        return [...filteredEvents, newEvent];
+    });
+};
 
   // 날짜 선택 시 이벤트 발생
   const handleDateSelect = (selectInfo) => {
@@ -143,14 +165,26 @@ const Schedular = () => {
     setIsScheduleModalOpen(false);
   };
 
-  // 이벤트 클릭 시 삭제 핸들러
+  // 이벤트 클릭 시 삭제
   const handleEventClick = (clickInfo) => {
-    if (window.confirm(`'${clickInfo.event.title}' 이벤트를 삭제할까요?`)) {
-      setEvents((prevEvents) =>
-        prevEvents.filter((event) => event.id !== clickInfo.event.id)
-      );
-    }
-  };
+  if (clickInfo.event.title === '선택중') {
+    return;
+  }
+
+  if (window.confirm(`'${clickInfo.event.title}' 이벤트를 삭제할까요?`)) {
+    setEvents((prevEvents) =>
+      prevEvents.filter((event) => event.id !== clickInfo.event.id)
+    );
+  }
+};
+
+// "선택중" 셀의 드래그 비활성화 및 커서 스타일 설정
+const handleEventDidMount = (eventInfo) => {
+  if (eventInfo.event.title === '선택중') {
+    eventInfo.el.style.cursor = 'not-allowed';
+    eventInfo.event.setProp('editable', false); // 드래그 불가능하도록 설정
+  }
+};
 
   if (!initialDate) {
     return <div>로딩 중...</div>;
@@ -180,6 +214,7 @@ const Schedular = () => {
         events={events}
         select={handleDateSelect}
         eventClick={handleEventClick}
+        eventDidMount={handleEventDidMount}
         editable={true}
         slotDuration="00:30:00"
       />
@@ -191,6 +226,7 @@ const Schedular = () => {
           onRequestClose={closeScheduleModal}
           className="modal-content"
           overlayClassName="modal-overlay-schedule"
+          shouldCloseOnOverlayClick={false} // 배경 클릭 비활성화
         >
           <ScheduleDetail
             startTime={startTime}

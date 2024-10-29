@@ -139,8 +139,10 @@ function AutoCompleteSearch({onClose}) {
             <button className="save-button" onClick={saveSelection}>선택 완료</button>
 
             {/* RecommendationSearch 모달 */}
-            <Modal isOpen={isModalOpen} onRequestClose={handleCloseModal}  className="modal-content"
-          overlayClassName="modal-overlay">
+            <Modal isOpen={isModalOpen} onRequestClose={handleCloseModal}
+             shouldCloseOnOverlayClick={false} // 배경 클릭 비활성화
+              className="modal-content"
+            overlayClassName="modal-overlay" >
                 <RecommendationSearch eventId={eventId} onClose={handleCloseModal} />
             </Modal>
 

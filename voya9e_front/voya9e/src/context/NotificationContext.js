@@ -12,6 +12,8 @@ export const NotificationProvider = ({ children }) => {
     const stompClientRef = useRef(null);  // stompClient 상태를 유지할 수 있는 ref 사용
     const [selectedCell, setSelectedCell] = useState(null); // 선택한 셀 상태
     const [deletedCell, setDeletedCell] = useState(null); // 삭제한 셀 상태
+    const [deletedCellId, setDeletedCellId] = useState(null); // 삭제한 셀 상태
+    const [updatedCell, setUpdatedCell] = useState(null); // 저장한 셀 상태
     const [savedCell, setSavedCell] = useState(null); // 저장한 셀 상태
     const [stompClient, setStompClient] = useState(null); // STOMP 클라이언트 상태
 
@@ -75,13 +77,24 @@ export const NotificationProvider = ({ children }) => {
                             console.log('받은 선택 셀 데이터:', data);
                         });
 
-                         // 일정 관련 셀 삭제
+                         // 일정 관련 셀 삭제(시간으로)
                          stompClientRef.current.subscribe('/topic/deletedCells', (message) => {
                             const data = JSON.parse(message.body);
                             setDeletedCell(data); // 선택된 셀 데이터 업데이트
                             console.log('받은 삭제 셀 데이터:', data);
                         });
-
+                        // 일정 관련 셀 삭제(아이디로)
+                        stompClientRef.current.subscribe('/topic/deletedCellsId', (message) => {
+                            const data = JSON.parse(message.body);
+                            console.log('받은 삭제아이디 셀 데이터:', data);
+                            setDeletedCellId(data); // 선택된 셀 데이터 업데이트
+                        });
+                        // 일정 관련 셀 수정
+                        stompClientRef.current.subscribe('/topic/updatedCells', (message) => {
+                            const data = JSON.parse(message.body);
+                            console.log('받은 수정 셀 데이터:', data);
+                            setUpdatedCell(data); // 선택된 셀 데이터 업데이트
+                        });
                         // 일정 관련 셀 저장
                         stompClientRef.current.subscribe('/topic/savedCells', (message) => {
                             const data = JSON.parse(message.body);
@@ -124,7 +137,7 @@ export const NotificationProvider = ({ children }) => {
 
     return (
         <NotificationContext.Provider value={{ notifications, unreadCount, markAsRead, updateUnreadCount, userId, markAllAsRead,selectedCell,
-            deletedCell,savedCell,stompClient
+            deletedCell, deletedCellId, updatedCell, savedCell,stompClient
 }}>
             {children}
         </NotificationContext.Provider>

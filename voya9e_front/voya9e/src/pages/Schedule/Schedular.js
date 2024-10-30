@@ -6,6 +6,7 @@ import interactionPlugin from '@fullcalendar/interaction';
 import { DateTime } from 'luxon';
 import Modal from 'react-modal';
 import ScheduleDetail from './ScheduleDetail';
+import ScheduleUpdate from './ScheduleUpdate';
 import { useNotification } from '../../context/NotificationContext';
 import './Schedular.css';
 
@@ -17,10 +18,14 @@ const Schedular = () => {
   const [initialDate, setInitialDate] = useState(null);
   const [validRange, setValidRange] = useState({});
   const [numberOfDays, setNumberOfDays] = useState(7);
-  const { selectedCell, deletedCell, savedCell, stompClient } = useNotification();
+  const { selectedCell, deletedCell,deletedCellId, updatedCell, savedCell, stompClient } = useNotification();
   const [isScheduleModalOpen, setIsScheduleModalOpen] = useState(false);
   const [startTime, setStartTime] = useState(null);
   const [endTime, setEndTime] = useState(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editEventData, setEditEventData] = useState(null);
+  const [originalEvent, setOriginalEvent] = useState(null);
+
 
   useEffect(() => {
     const fetchEventData = async () => {
@@ -30,14 +35,12 @@ const Schedular = () => {
 
         if (eventData) {
           const { startDate, endDate } = eventData;
-
+          
           setInitialDate(startDate);
           const adjustedEndDate = DateTime.fromISO(endDate).plus({ days: 1 }).toISODate();
           setValidRange({ start: startDate, end: adjustedEndDate });
 
-          const start = DateTime.fromISO(startDate);
-          const end = DateTime.fromISO(endDate);
-          const dayDifference = end.diff(start, 'days').days + 1;
+          const dayDifference = DateTime.fromISO(endDate).diff(DateTime.fromISO(startDate), 'days').days + 1;
           setNumberOfDays(dayDifference);
         }
 
@@ -49,6 +52,7 @@ const Schedular = () => {
             title: location.description,
             start: DateTime.fromISO(location.visitStartTime).toISO(),
             end: DateTime.fromISO(location.visitEndTime).toISO(),
+            extendedProps: { editable: true },
           }));
           setEvents(loadedEvents);
         }
@@ -56,33 +60,17 @@ const Schedular = () => {
         console.error('이벤트 데이터를 불러오는 중 오류 발생:', error);
       }
     };
-
     fetchEventData();
   }, [eventId]);
 
-  // WebSocket으로 선택된 셀 데이터 받기
+  // WebSocket으로 데이터 수신
   useEffect(() => {
-    if (selectedCell) {
-      console.log('WebSocket으로 받은 선택 셀 데이터:', selectedCell);
-      handleReceivedSelection(selectedCell);
-    }
-  }, [selectedCell]);
-
-  // WebSocket으로 삭제된 셀 데이터 받기
-  useEffect(() => {
-    if (deletedCell) {
-      console.log('삭제할 셀 정보:', deletedCell);
-      handleRemoveSelection(deletedCell);
-    }
-  }, [deletedCell]);
-
-  // WebSocket으로 저장할 셀 데이터 받기
-  useEffect(() => {
-    if (savedCell) {
-      console.log('저장 셀 정보:', savedCell);
-      handleSavedSelection(savedCell);
-    }
-  }, [savedCell]);
+    if (selectedCell) handleReceivedSelection(selectedCell);//셀 선택
+    if (deletedCell) handleRemoveSelection(deletedCell);//셀 시간으로 삭제
+    if (deletedCellId) handleRemoveSelectionId(deletedCellId);//셀 아이디로 삭제
+    if (updatedCell) handleUpdatedSelection(updatedCell);//셀 수정
+    if (savedCell) handleSavedSelection(savedCell);//셀 저장
+  }, [selectedCell, deletedCell, deletedCellId, updatedCell, savedCell]);
 
   const handleReceivedSelection = (cellData) => {
     const { startTime, endTime } = cellData;
@@ -95,7 +83,6 @@ const Schedular = () => {
       backgroundColor: '#ffbf0052',
       borderColor: '#ffbf0052',
     };
-
     setEvents((prevEvents) => [...prevEvents, newEvent]);
   };
 
@@ -111,14 +98,35 @@ const Schedular = () => {
     });
   };
 
+  const handleRemoveSelectionId = (cellIdToDelete) => {
+    setEvents((prevEvents) => prevEvents.filter(event => event.id !== cellIdToDelete));
+  };
+
+const handleUpdatedSelection = (updatedData) => {
+  const newEvent = {
+      id: updatedData.pinId,
+      title: updatedData.description,
+      start: DateTime.fromISO(updatedData.visitStart).toISO(),
+      end: DateTime.fromISO(updatedData.visitEnd).toISO(),
+      extendedProps: { editable: true },
+  };
+
+  setEvents((prevEvents) => {
+      const filteredEvents = prevEvents.filter((event) => 
+          !(event.id === newEvent.id)
+      );
+      return [...filteredEvents, newEvent];
+  });
+};
+
   const handleSavedSelection = (savedCell) => {
     const newEvent = {
         id: savedCell.pinId,
         title: savedCell.description,
         start: DateTime.fromISO(savedCell.visitStart).toISO(),
         end: DateTime.fromISO(savedCell.visitEnd).toISO(),
+        extendedProps: { editable: true }
     };
-
     setEvents((prevEvents) => {
         const filteredEvents = prevEvents.filter(event => {
             const eventStartWithoutTZ = event.start.split('.')[0];
@@ -132,15 +140,13 @@ const Schedular = () => {
 
   // 날짜 선택 시 이벤트 발생
   const handleDateSelect = (selectInfo) => {
-    let calendarApi = selectInfo.view.calendar;
-    calendarApi.unselect();
 
     const startDateTime = DateTime.fromISO(selectInfo.startStr, { zone: 'Asia/Seoul' });
     const endDateTime = DateTime.fromISO(selectInfo.endStr, { zone: 'Asia/Seoul' });
 
     const start = startDateTime.toFormat('yyyy-MM-dd\'T\'HH:mm:ss');
     const end = endDateTime.toFormat('yyyy-MM-dd\'T\'HH:mm:ss');
-
+    
     const selectionData = {
       id: Date.now().toString(),
       startTime: start,
@@ -160,22 +166,9 @@ const Schedular = () => {
 
   };
 
-  // 모달 닫기
-  const closeScheduleModal = () => {
-    setIsScheduleModalOpen(false);
-  };
-
-  // 이벤트 클릭 시 삭제
-  const handleEventClick = (clickInfo) => {
-  if (clickInfo.event.title === '선택중') {
-    return;
-  }
-
-  if (window.confirm(`'${clickInfo.event.title}' 이벤트를 삭제할까요?`)) {
-    setEvents((prevEvents) =>
-      prevEvents.filter((event) => event.id !== clickInfo.event.id)
-    );
-  }
+ // 이벤트 클릭 시 수정페이지로
+ const handleEventClick = async (clickInfo) => {
+  await fetchEventLocation(clickInfo.event.id, clickInfo.event.start, clickInfo.event.end);
 };
 
 // "선택중" 셀의 드래그 비활성화 및 커서 스타일 설정
@@ -184,7 +177,123 @@ const handleEventDidMount = (eventInfo) => {
     eventInfo.el.style.cursor = 'not-allowed';
     eventInfo.event.setProp('editable', false); // 드래그 불가능하도록 설정
   }
+  
 };
+
+// const checkForOverlappingSelectedCell = (start, end, id) => {
+//   console.log("start,end", start, end);
+
+//   return events.some(event => {
+//     // 본인 이벤트는 무시
+//     if (event.id === id) return false;
+
+//     console.log("dfs",eventStart)
+
+//     const eventStart = new Date(event.start); // 이벤트 시작 시간
+//     const eventEnd = new Date(event.end); // 이벤트 종료 시간
+
+//     // 시간 겹치는지 확인
+//     const isTimeOverlapping = (start < eventEnd && end > eventStart);
+
+//     // 두 조건 중 하나라도 충족하면 true 반환
+//     return isTimeOverlapping;
+//   });
+// };
+
+
+// KST로 변환하여 ISO 문자열로 반환하는 함수
+const convertToISODate = (date) => {
+  const kstOffset = 9 * 60 * 60 * 1000; // KST 오프셋 (9시간)
+  const kstDate = new Date(date.getTime() + kstOffset);
+  return kstDate.toISOString().replace(".000Z", ""); // .000Z 제거
+};
+
+const handleEventChange = async (eventInfo) => {
+  // const { start, end, id } = eventInfo.event;
+  // // 선택된 셀과의 중복 확인
+  // if (checkForOverlappingSelectedCell(start,end,id)) {
+  //   console.log("여기로 들어가나요?")
+  //   eventInfo.revert();
+  //   return;
+  // }
+
+  // 드래그 또는 리사이즈가 유효한 경우
+  if (eventInfo.event.extendedProps.editable) {
+    console.log("왜 안되나요?")
+    await fetchEventLocation(eventInfo.event.id, eventInfo.event.start, eventInfo.event.end);
+  }
+};
+
+const handleEventDrop = async (dropInfo) => {
+  console.log("Dfs",dropInfo)
+
+  const startDateTime = convertToISODate(dropInfo.oldEvent.start);
+  const endDateTime = convertToISODate(dropInfo.oldEvent.end);
+
+    // 드롭 직전의 원래 이벤트 정보 저장
+    const originalEventInfo = {
+      id: dropInfo.oldEvent.id,
+      title: dropInfo.oldEvent.title,
+      start: startDateTime,
+      end: endDateTime,
+      extendedProps: { editable: true },
+    };
+  
+    setOriginalEvent(originalEventInfo);
+
+  await handleEventChange(dropInfo);
+};
+
+const handleEventResize = async (resizeInfo) => {
+  await handleEventChange(resizeInfo);
+};
+
+const fetchEventLocation = async (pinId, startTime, endTime) => {
+  try {
+
+    const startDateTime = convertToISODate(startTime);
+    const endDateTime = convertToISODate(endTime);
+
+    const response = await fetch(`/events/${pinId}/eventLocations`);
+    if (!response.ok) throw new Error('Failed to fetch event location');
+
+    const data = await response.json();
+    setEditEventData({
+      pinId: pinId,
+      location: data.location,
+      description: data.description,
+      visitStartTime: startDateTime,
+      visitEndTime: endDateTime
+    });
+    setIsEditModalOpen(true); // 모달 열기
+  } catch (error) {
+    console.error('Error fetching event location:', error);
+  }
+};
+
+const closeEditModal = (action) => {
+
+  if (action === 'back') {
+      setEvents((prevEvents) => {
+          if (!originalEvent) {
+              return prevEvents;
+          }
+          const updatedEvents = prevEvents.filter(event => {
+              return event.id !== originalEvent.id || event.start !== originalEvent.start;
+          });
+
+          return [...updatedEvents, originalEvent];
+      });
+  }
+
+  setIsEditModalOpen(false); // 모달 닫기
+};
+
+  // 모달 닫기
+  const closeScheduleModal = () => {
+    setIsScheduleModalOpen(false);
+  };
+
 
   if (!initialDate) {
     return <div>로딩 중...</div>;
@@ -215,6 +324,8 @@ const handleEventDidMount = (eventInfo) => {
         select={handleDateSelect}
         eventClick={handleEventClick}
         eventDidMount={handleEventDidMount}
+        eventDrop={handleEventDrop}       // 이벤트 이동 시 트리거
+        eventResize={handleEventResize}   // 이벤트 리사이즈 시 트리거
         editable={true}
         slotDuration="00:30:00"
       />
@@ -236,6 +347,23 @@ const handleEventDidMount = (eventInfo) => {
           />
         </Modal>
       )}
+      {isEditModalOpen && (
+        <Modal
+          isOpen={isEditModalOpen}
+          onRequestClose={closeEditModal}
+          className="modal-content"
+          overlayClassName="modal-overlay"
+          shouldCloseOnOverlayClick={false} // 배경 클릭 비활성화
+        >
+        <ScheduleUpdate
+            {...editEventData} // editEventData의 모든 속성을 props로 전달
+            originalEvent={originalEvent} // originalEvent를 props로 전달
+          onClose={closeEditModal} // 모달 닫기
+        />
+        </Modal>
+        
+      )}
+      
     </div>
   );
 };

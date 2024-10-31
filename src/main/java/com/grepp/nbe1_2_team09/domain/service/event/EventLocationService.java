@@ -10,7 +10,7 @@ import com.grepp.nbe1_2_team09.controller.event.dto.UpdateEventLocationReq;
 import com.grepp.nbe1_2_team09.domain.entity.Location;
 import com.grepp.nbe1_2_team09.domain.entity.event.Event;
 import com.grepp.nbe1_2_team09.domain.entity.event.EventLocation;
-import com.grepp.nbe1_2_team09.domain.repository.event.EventLocationRepository;
+import com.grepp.nbe1_2_team09.domain.repository.event.eventlocationrepo.EventLocationRepository;
 import com.grepp.nbe1_2_team09.domain.repository.event.eventrepo.EventRepository;
 import com.grepp.nbe1_2_team09.domain.repository.location.LocationRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.grepp.nbe1_2_team09.domain.entity.event.QEvent.event;
 
 @Slf4j
 @Service
@@ -78,7 +76,7 @@ public class EventLocationService {
     public List<EventLocationInfoDto> getEventLocationByDate(Long eventId, LocalDate date){
         Event event = findEventByIdOrThrowEventException(eventId);
 
-        List<EventLocation> eventLocations = eventLocationRepository.findByEventAndDateOrderByTime(event,date);
+        List<EventLocation> eventLocations = eventLocationRepository.findByEventAndDate(event,date);
 
         List<EventLocationInfoDto> infos = eventLocations.stream()
                 .map(EventLocationInfoDto::from)
@@ -127,15 +125,6 @@ public class EventLocationService {
         return locationRepository.findById(locationId)
                 .orElseThrow(() -> {
                     log.warn(">>>> LocationId {} : {} <<<<", locationId, ExceptionMessage.LOCATION_NOT_FOUND);
-                    return new LocationException(ExceptionMessage.LOCATION_NOT_FOUND);
-                });
-    }
-
-    private EventLocation findEventLocationOrThrowException(Event event, Location location) {
-        return eventLocationRepository.findByEventAndLocation(event, location)
-                .orElseThrow(() -> {
-                    log.warn(">>>> EventLocation not found for Event {} and Location {} : {} <<<<",
-                            event.getEventId(), location.getLocationId(), ExceptionMessage.LOCATION_NOT_FOUND);
                     return new LocationException(ExceptionMessage.LOCATION_NOT_FOUND);
                 });
     }

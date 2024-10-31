@@ -22,6 +22,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.grepp.nbe1_2_team09.domain.entity.event.QEvent.event;
+
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -65,6 +67,13 @@ public class EventLocationService {
         return infos;
     }
 
+    //장소아이디로 일정 가져오기
+    public EventLocationInfoDto getEventLocationsById(Long pinId){
+        EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
+
+        return EventLocationInfoDto.from(eventLocation);
+    }
+
     //일정에 포함되고 선택한 날짜랑 같은 장소 불러오기(시간 빠른 순서)
     public List<EventLocationInfoDto> getEventLocationByDate(Long eventId, LocalDate date){
         Event event = findEventByIdOrThrowEventException(eventId);
@@ -80,11 +89,9 @@ public class EventLocationService {
 
 
     @Transactional
-    public EventLocationDto updateEventLocation(Long eventId, Long locationId, UpdateEventLocationReq req){
-        Event event = findEventByIdOrThrowEventException(eventId);
-        Location location = findLocationByIdOrThrowLocationException(locationId);
+    public EventLocationDto updateEventLocation(Long pinId, UpdateEventLocationReq req){
 
-        EventLocation eventLocation = findEventLocationOrThrowException(event, location);
+        EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
 
         if(req.description() != null){
             eventLocation.updateDescription(req.description());
@@ -93,7 +100,6 @@ public class EventLocationService {
             eventLocation.updateVisitTime(req.visitStartTime(), req.visitEndTime());
         }
 
-
         return EventLocationDto.from(eventLocation);
     }
 
@@ -101,11 +107,8 @@ public class EventLocationService {
 
     //일정에 포함된 장소 삭제
     @Transactional
-    public void removeLocationFromEvent(Long eventId, Long locationId){
-        Event event = findEventByIdOrThrowEventException(eventId);
-        Location location = findLocationByIdOrThrowLocationException(locationId);
-
-        EventLocation eventLocation = findEventLocationOrThrowException(event, location);
+    public void removeLocationFromEvent(Long pinId){
+        EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
 
         eventLocationRepository.delete(eventLocation);
     }
@@ -133,6 +136,15 @@ public class EventLocationService {
                 .orElseThrow(() -> {
                     log.warn(">>>> EventLocation not found for Event {} and Location {} : {} <<<<",
                             event.getEventId(), location.getLocationId(), ExceptionMessage.LOCATION_NOT_FOUND);
+                    return new LocationException(ExceptionMessage.LOCATION_NOT_FOUND);
+                });
+    }
+
+    private EventLocation findEventLocationByIdOrThrowException(Long pinId) {
+        return eventLocationRepository.findById(pinId)
+                .orElseThrow(() -> {
+                    log.warn(">>>> PinId {} : {} <<<<",
+                           pinId, ExceptionMessage.LOCATION_NOT_FOUND);
                     return new LocationException(ExceptionMessage.LOCATION_NOT_FOUND);
                 });
     }

@@ -48,7 +48,7 @@ function AutoCompleteSearch({onClose}) {
                     const placeDetail = response.data;
 
                     const locationData = {
-                        placeId:placeDetail.placeId,
+                        placeId:placeDetail.place_id,
                         placeName: placeDetail.name,
                         latitude: placeDetail.latitude,
                         longitude: placeDetail.longitude,
@@ -56,7 +56,7 @@ function AutoCompleteSearch({onClose}) {
                         rating: placeDetail.rating || 0,
                         photo: placeDetail.photoUrl
                     };
-
+                    
                     // locationData를 sessionStorage에 저장
                     sessionStorage.setItem('locationData', JSON.stringify(locationData));
 

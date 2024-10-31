@@ -94,6 +94,7 @@ function RecommendationSearch({eventId,onClose}) {
             console.log('선택된 장소:', selectedPlace);
 
             const locationData = {
+                placeId:selectedPlace.placeId,
                 placeName: selectedPlace.name,
                 latitude: selectedPlace.latitude,
                 longitude: selectedPlace.longitude,

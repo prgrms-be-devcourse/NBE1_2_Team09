@@ -39,7 +39,6 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
         sessionStorage.removeItem('locationData'); // 세션 스토리지 초기화
 
         const selectionData = {
-            // date: selectedDate,
             startTime: startTime,
             endTime: endTime,
         };
@@ -49,7 +48,6 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
                 destination: '/app/deleteCell',
                 body: JSON.stringify(selectionData),
             });
-            console.log('셀 삭제 정보 전송:', selectionData);
         }
         onClose()
     };
@@ -60,6 +58,7 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
             return;
         }
         const locationReq = {
+            placeId:locationData.placeId,
             placeName: locationData.placeName,
             latitude: locationData.latitude,
             longitude: locationData.longitude,
@@ -83,7 +82,6 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
             alert("일정이 저장되었습니다.");
 
             onClose()
-            //navigate(`/schedular/${eventId}`);
             sessionStorage.removeItem('locationData');
 
              // 여기서 웹소켓을 통해 다른 클라이언트에게 알리기

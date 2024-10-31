@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.w3c.dom.Text;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,10 +16,13 @@ import java.util.List;
 @ToString
 @NoArgsConstructor
 @AllArgsConstructor
-public class Location {
+public class Location implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long locationId;
+
+    @Column(unique = true)
+    private String placeId;
 
     @Column(nullable = false, length = 100)
     private String placeName;
@@ -52,7 +56,8 @@ public class Location {
     //비즈니스 메서드
 
     @Builder
-    public Location(String placeName, BigDecimal latitude, BigDecimal longitude, String address, BigDecimal rating,String photo, EventLocation eventLocation) {
+    public Location(String placeId, String placeName, BigDecimal latitude, BigDecimal longitude, String address, BigDecimal rating,String photo, EventLocation eventLocation) {
+        this.placeId = placeId;
         this.placeName = placeName;
         this.latitude = latitude;
         this.longitude = longitude;

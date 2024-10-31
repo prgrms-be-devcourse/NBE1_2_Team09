@@ -6,6 +6,7 @@ import com.grepp.nbe1_2_team09.domain.entity.LocationType;
 import java.math.BigDecimal;
 
 public record CreateLocationRequest(
+         String placeId,
          String placeName,
          BigDecimal latitude,
          BigDecimal longitude,
@@ -16,6 +17,7 @@ public record CreateLocationRequest(
     //DTO->Entity
     public Location toEntity(){
         return Location.builder()
+                .placeId(placeId)
                 .placeName(placeName)
                 .latitude(latitude)
                 .longitude(longitude)

@@ -1,3 +1,46 @@
+/* 모달 오버레이 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75); /* 반투명한 검은 배경 */
+    z-index: 1000; /* 모달이 다른 요소들 위에 나타나도록 */
+}
+
+/* 모달 콘텐츠 스타일 */
+.modal-content {
+    position: absolute;
+    top: 50%; /* 화면의 중앙에 위치 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 완벽하게 가운데 정렬 */
+    background-color: #fff; /* 흰색 배경 */
+    padding: 20px;
+    width: 90%; /* 기본적으로 화면의 90% 너비 */
+    height: 80%;
+    max-width: 400px; /* 최대 너비 */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    z-index: 1002; /* 오버레이 위에 위치 */
+    outline: none; /* 포커스 시 테두리 제거 */
+    overflow-y: auto; /* 세로 스크롤 활성화 */
+}
+
+/* 스크롤바 꾸미기 (선택사항) */
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background-color: rgba(0, 0, 0, 0.3);
+    border-radius: 3px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(0, 0, 0, 0.5);
+}
+
 .place-detail {
     width: 100%;
     max-width: 400px;

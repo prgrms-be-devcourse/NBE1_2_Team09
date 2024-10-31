@@ -53,7 +53,7 @@ const GroupMembers = () => {
     };
 
     const handleAddSchedule = (eventId) => {
-        navigate(`/schedule/${eventId}`);
+        navigate(`/schedular/${eventId}`);
     };
 
     const handleChangeRole = async (username, newRole) => {

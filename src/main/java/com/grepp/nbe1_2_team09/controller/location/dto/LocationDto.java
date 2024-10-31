@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 
 public record LocationDto(
         Long locationId,
+        String placeId,
         String placeName,
         BigDecimal latitude,
         BigDecimal longitude,
@@ -17,6 +18,7 @@ public record LocationDto(
     public static LocationDto fromEntity(Location location){
         return new LocationDto(
                 location.getLocationId(),
+                location.getPlaceId(),
                 location.getPlaceName(),
                 location.getLatitude(),
                 location.getLongitude(),

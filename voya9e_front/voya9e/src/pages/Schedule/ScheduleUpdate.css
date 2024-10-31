@@ -1,5 +1,5 @@
 /* 모달 오버레이 스타일 */
-.modal-overlay-schedule {
+.modal-overlay {
     position: fixed;
     top: 0;
     left: 0;
@@ -103,7 +103,7 @@ button {
 
 button:hover {
     background-color: rgba(14, 118, 168, 0.1); /* 호버 시 배경 색상 */
-    color: #0E76A8; /* 호버 시 글자 색상 변화 */
+   
 }
 
 /* 저장 버튼 */
@@ -115,4 +115,24 @@ button:hover {
     border-radius: 8px;
     font-size: 16px;
     cursor: pointer;
+}
+
+.btn-warning{
+    background-color: #ffc107;
+    color: rgba(248, 248, 248, 0.87);
+    border: 1px solid #ffc107; /* 테두리 추가 */
+}
+.btn-warning:hover{
+    background-color: #ffc107;
+    color: rgba(248, 248, 248, 0.87);
+}
+
+.btn-danger{
+    background-color: #dc3545;
+    color: rgba(248, 248, 248, 0.87);
+    border: 1px solid #dc3545; /* 테두리 추가 */
+}
+.btn-danger:hover{
+    background-color: #dc3545;
+    color: rgba(248, 248, 248, 0.87);
 }

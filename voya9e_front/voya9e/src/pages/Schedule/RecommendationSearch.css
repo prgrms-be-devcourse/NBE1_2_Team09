@@ -1,5 +1,32 @@
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans&display=swap'); /* Google Font */
+/* 모달 오버레이 스타일 */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.75); /* 반투명한 검은 배경 */
+    z-index: 1000; /* 모달이 다른 요소들 위에 나타나도록 */
+}
 
+/* 모달 콘텐츠 스타일 */
+.modal-content {
+    position: absolute;
+    top: 50%; /* 화면의 중앙에 위치 */
+    left: 50%;
+    transform: translate(-50%, -50%); /* 완벽하게 가운데 정렬 */
+    background-color: #fff; /* 흰색 배경 */
+    padding: 20px;
+    width: 90%; /* 기본적으로 화면의 90% 너비 */
+    height: 80vh;
+    max-width: 400px; /* 최대 너비 */
+    border-radius: 8px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* 그림자 효과 */
+    z-index: 1003; /* 오버레이 위에 위치 */
+    outline: none; /* 포커스 시 테두리 제거 */
+    overflow: hidden; /* 모달 내부의 오버플로우 숨김 */
+}
 .recommendation-search {
     width: 100%;
     max-width: 400px;
@@ -8,8 +35,10 @@
     border-radius: 8px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     display: flex;
+    flex: 1; /* 콘텐츠 영역을 차지하도록 설정 */
     flex-direction: column;
     height: 100vh; /* 화면 전체 높이 사용 */
+    justify-content: space-between; /* 위쪽과 아래쪽으로 공간 배분 */
 }
 
 .place-types, .sort-options {
@@ -37,6 +66,7 @@
     margin: 10px 0;
     flex: 1;
     overflow-y: auto; /* 스크롤 가능 */
+    max-height: 300px;
 }
 
 .place-item {
@@ -60,7 +90,7 @@
 
 .place-image-container {
     width: 80px; /* 고정 너비 */
-    height: 80px; /* 고정 높이 */
+    height: 60px; /* 고정 높이 */
     overflow: hidden; /* 내용이 범위를 넘지 않도록 */
     border-radius: 4px; /* 둥글게 */
     margin-right: 10px; /* 오른쪽 여백 */
@@ -99,4 +129,19 @@ body {
     color: #212121;
     font-size: 27px;
     margin: 0;
+}
+/* 저장 버튼 스타일 */
+.save-button {
+    padding: 10px 20px;
+    background-color: #008CFF;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    width: 100%; /* 버튼의 고정 너비 설정 */
+}
+
+.save-button:hover {
+    background-color: #065A91; /* 버튼 호버 색상 */
 }

@@ -35,6 +35,12 @@ public class EventLocationController {
         return ResponseEntity.ok(locations);
     }
 
+    @GetMapping("/{pinId}/eventLocations")
+    public ResponseEntity<EventLocationInfoDto> getEventLocationsById(@PathVariable Long pinId) {
+        EventLocationInfoDto locations = eventLocationService.getEventLocationsById(pinId);
+        return ResponseEntity.ok(locations);
+    }
+
     @GetMapping("/{eventId}/locationsByDate")
     public ResponseEntity<List<EventLocationInfoDto>> getEventLocationsByDate(
             @PathVariable Long eventId,
@@ -44,18 +50,17 @@ public class EventLocationController {
     }
 
 
-    @PatchMapping("/{eventId}/locations/{locationId}")
+    @PatchMapping("/{pinId}/eventLocations")
     public ResponseEntity<EventLocationDto> updateEventLocation(
-            @PathVariable Long eventId,
-            @PathVariable Long locationId,
+            @PathVariable Long pinId,
             @Valid @RequestBody UpdateEventLocationReq request) {
-        EventLocationDto result = eventLocationService.updateEventLocation(eventId, locationId, request);
+        EventLocationDto result = eventLocationService.updateEventLocation(pinId, request);
         return ResponseEntity.ok(result);
     }
 
-    @DeleteMapping("/{eventId}/locations/{locationId}")
-    public ResponseEntity<Void> removeLocationFromEvent(@PathVariable Long eventId, @PathVariable Long locationId) {
-        eventLocationService.removeLocationFromEvent(eventId, locationId);
+    @DeleteMapping("/{pinId}/eventLocations")
+    public ResponseEntity<Void> removeLocationFromEvent(@PathVariable Long pinId) {
+        eventLocationService.removeLocationFromEvent(pinId);
         return ResponseEntity.noContent().build();
     }
 }

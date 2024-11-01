@@ -1,5 +1,7 @@
 package com.grepp.nbe1_2_team09.controller.location.dto;
 
+
+import java.io.Serializable;
 import java.math.BigDecimal;
 
 public record PlaceRecommendResponse(
@@ -11,5 +13,5 @@ public record PlaceRecommendResponse(
         Integer user_ratings_total,
         String address,
         String photoUrl
-) {
+) implements Serializable {
 }

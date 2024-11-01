@@ -1,7 +1,6 @@
 package com.grepp.nbe1_2_team09.controller.location.dto;
 
 import com.grepp.nbe1_2_team09.domain.entity.Location;
-import com.grepp.nbe1_2_team09.domain.entity.LocationType;
 
 import java.math.BigDecimal;
 

@@ -1,7 +1,6 @@
 package com.grepp.nbe1_2_team09.controller.location.dto;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 public record PlaceDetailResponse(
         String place_id,

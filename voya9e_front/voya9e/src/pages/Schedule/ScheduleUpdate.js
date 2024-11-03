@@ -12,6 +12,7 @@ const ScheduleUpdate = ({ pinId, location, description, visitStartTime, visitEnd
     const { stompClient } = useNotification();
 
     const handleUpdate = async () => {
+        console.log("1111111111",pinId)
         const updateRequest = {
             description: eventDescription,
             visitStartTime,
@@ -66,11 +67,22 @@ const ScheduleUpdate = ({ pinId, location, description, visitStartTime, visitEnd
             alert("삭제 중 오류가 발생했습니다.");
         }
     };
-    const handleBackButton = () => {
-        // 'back' 인자를 onClose에 전달
-        onClose('back');
+    const handleBackButton = async () => {
+        console.log("pinId!!!:", pinId); // pinId 값을 콘솔에 출력하여 확인
+    
+        try {
+            await fetch('/events/api/unlockLocation', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ pinId }) // pinId를 객체로 감싸서 전송
+            });
+            onClose('back');
+        } catch (error) {
+            console.error('Error releasing lock:', error);
+        }
     };
-
 
     return (
         <div className="schedule-detail">

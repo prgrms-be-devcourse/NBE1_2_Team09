@@ -51,7 +51,10 @@ public enum ExceptionMessage {
     INVITATION_NOT_FOUND("해당 초대를 찾을 수 없습니다."),
 
     // Location
-    LOCATION_NOT_FOUND("해당 장소를 찾을 수 없습니다.")
+    LOCATION_NOT_FOUND("해당 장소를 찾을 수 없습니다."),
+
+    //EventLocation
+    EVENT_LOCATION_LOCKED("락이 걸려있습니다. 다른 사용자가 수정중입니다.")
 
     ;
 

@@ -13,11 +13,19 @@ import com.grepp.nbe1_2_team09.domain.entity.event.EventLocation;
 import com.grepp.nbe1_2_team09.domain.repository.event.eventlocationrepo.EventLocationRepository;
 import com.grepp.nbe1_2_team09.domain.repository.event.eventrepo.EventRepository;
 import com.grepp.nbe1_2_team09.domain.repository.location.LocationRepository;
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.LockTimeoutException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.hibernate.exception.LockAcquisitionException;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.PessimisticLockingFailureException;
+import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -31,10 +39,11 @@ public class EventLocationService {
     private final EventRepository eventRepository;
     private final LocationRepository locationRepository;
     private final EventLocationRepository eventLocationRepository;
+    private final RedisTemplate<String, String> eventLocationRedisTemplate;
 
     //일정에 장소 추가
     @Transactional
-    public EventLocationDto addLocationToEvent(Long eventId, AddEventLocationReq req){
+    public EventLocationDto addLocationToEvent(Long eventId, AddEventLocationReq req) {
         Event event = findEventByIdOrThrowEventException(eventId);
         Location location = findLocationByIdOrThrowLocationException(req.locationId());
 
@@ -51,9 +60,8 @@ public class EventLocationService {
     }
 
 
-
     //일정에 포함된 장소 불러오기
-    public List<EventLocationInfoDto> getEventLocations(Long eventId){
+    public List<EventLocationInfoDto> getEventLocations(Long eventId) {
         Event event = findEventByIdOrThrowEventException(eventId);
 
         List<EventLocation> eventLocations = eventLocationRepository.findByEvent(event);
@@ -66,17 +74,25 @@ public class EventLocationService {
     }
 
     //장소아이디로 일정 가져오기
-    public EventLocationInfoDto getEventLocationsById(Long pinId){
-        EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
+    @Transactional
+    public EventLocationInfoDto getEventLocationsById(Long pinId) {
+        String lockKey = "lock:eventLocation:" + pinId;
 
+        // Redis에서 락을 확인 후 설정
+        if (Boolean.FALSE.equals(eventLocationRedisTemplate.opsForValue().setIfAbsent(lockKey, "LOCKED", Duration.ofMinutes(1)))) {
+            throw new EventException(ExceptionMessage.EVENT_LOCATION_LOCKED);
+        }
+
+        // 일정 조회 로직
+        EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
         return EventLocationInfoDto.from(eventLocation);
     }
 
     //일정에 포함되고 선택한 날짜랑 같은 장소 불러오기(시간 빠른 순서)
-    public List<EventLocationInfoDto> getEventLocationByDate(Long eventId, LocalDate date){
+    public List<EventLocationInfoDto> getEventLocationByDate(Long eventId, LocalDate date) {
         Event event = findEventByIdOrThrowEventException(eventId);
 
-        List<EventLocation> eventLocations = eventLocationRepository.findByEventAndDate(event,date);
+        List<EventLocation> eventLocations = eventLocationRepository.findByEventAndDate(event, date);
 
         List<EventLocationInfoDto> infos = eventLocations.stream()
                 .map(EventLocationInfoDto::from)
@@ -87,25 +103,27 @@ public class EventLocationService {
 
 
     @Transactional
-    public EventLocationDto updateEventLocation(Long pinId, UpdateEventLocationReq req){
+    public EventLocationDto updateEventLocation(Long pinId, UpdateEventLocationReq req) {
 
         EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
 
-        if(req.description() != null){
+        if (req.description() != null) {
             eventLocation.updateDescription(req.description());
         }
-        if(req.visitStartTime() != null && req.visitEndTime() != null){
+        if (req.visitStartTime() != null && req.visitEndTime() != null) {
             eventLocation.updateVisitTime(req.visitStartTime(), req.visitEndTime());
         }
+        // 수정 완료 후 락 해제
+        String lockKey = "lock:eventLocation:" + pinId;
+        eventLocationRedisTemplate.delete(lockKey);
 
         return EventLocationDto.from(eventLocation);
     }
 
 
-
     //일정에 포함된 장소 삭제
     @Transactional
-    public void removeLocationFromEvent(Long pinId){
+    public void removeLocationFromEvent(Long pinId) {
         EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
 
         eventLocationRepository.delete(eventLocation);
@@ -133,7 +151,7 @@ public class EventLocationService {
         return eventLocationRepository.findById(pinId)
                 .orElseThrow(() -> {
                     log.warn(">>>> PinId {} : {} <<<<",
-                           pinId, ExceptionMessage.LOCATION_NOT_FOUND);
+                            pinId, ExceptionMessage.LOCATION_NOT_FOUND);
                     return new LocationException(ExceptionMessage.LOCATION_NOT_FOUND);
                 });
     }

@@ -47,7 +47,7 @@ public class LocationApiService {
 
     //장소 추천
     // @LogExecutionTime
-    @Cacheable(value = "recommendedPlaces", key = "#eventId + '-' + #type")
+    //@Cacheable(value = "recommendedPlaces", key = "#eventId + '-' + #type")
     public List<PlaceRecommendResponse> getRecommendedPlaces(Long eventId, String type) {
         EventDto eventDto = eventService.getEventById(eventId);
         String cityName = eventDto.city();
@@ -74,7 +74,7 @@ public class LocationApiService {
 
     // id로 장소 상세 정보 조회
     // @LogExecutionTime
-    @Cacheable(value = "placeDetails", key = "#placeId")
+    //@Cacheable(value = "placeDetails", key = "#placeId")
     public PlaceDetailResponse getPlaceDetail(String placeId) {
         String url = "https://maps.googleapis.com/maps/api/place/details/json?placeid=" + placeId + "&key=" + apiKey;
 

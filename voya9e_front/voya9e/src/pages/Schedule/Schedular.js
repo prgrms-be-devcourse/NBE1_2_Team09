@@ -268,6 +268,7 @@ const fetchEventLocation = async (pinId, startTime, endTime) => {
     setIsEditModalOpen(true); // 모달 열기
   } catch (error) {
     console.error('Error fetching event location:', error);
+    alert("다른 사용자가 수정중입니다. 잠시 후에 다시 시도해 주세요.");
   }
 };
 
@@ -352,7 +353,7 @@ const closeEditModal = (action) => {
           isOpen={isEditModalOpen}
           onRequestClose={closeEditModal}
           className="modal-content"
-          overlayClassName="modal-overlay"
+          overlayClassName="modal-overlay-update"
           shouldCloseOnOverlayClick={false} // 배경 클릭 비활성화
         >
         <ScheduleUpdate

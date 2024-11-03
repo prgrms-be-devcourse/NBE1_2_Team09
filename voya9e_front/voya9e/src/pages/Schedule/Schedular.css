@@ -1,6 +1,17 @@
 .schedular-container {
-    width: 80%; /* 너비를 80%로 설정 */
-    height: 600px; /* 고정 높이 설정 */
-    margin: 0 auto; /* 가운데 정렬 */
-  }
-  
+  width: 90%; /* 너비를 80%로 설정 */
+  height: 100vh; /* 화면 전체 높이 */
+  margin: 0 auto; /* 가운데 정렬 */
+}
+.fc {
+  height: 100%; /* 부모 요소의 높이에 맞추기 */
+  display: flex; /* 자식 요소를 flexbox로 설정 */
+}
+
+.fc-media-screen {
+  height: 100%; /* 미디어 스크린 높이를 100%로 설정 */
+}
+
+.fc-direction-ltr {
+  height: 100%; /* 좌에서 우로 방향을 설정할 경우 높이 조정 */
+}

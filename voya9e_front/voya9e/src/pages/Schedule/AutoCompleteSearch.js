@@ -147,7 +147,7 @@ function AutoCompleteSearch({onClose}) {
 
              {/* PlaceDetail 모달 */}
              {selectedPlaceId && (
-                <Modal isOpen={isPlaceDetailOpen} onRequestClose={handleClosePlaceDetail} className="modal-content" overlayClassName="modal-overlay">
+                <Modal isOpen={isPlaceDetailOpen} onRequestClose={handleClosePlaceDetail} className="modal-content-detail" overlayClassName="modal-overlay">
                     <PlaceDetail placeId={selectedPlaceId} onClose={handleClosePlaceDetail} />
                 </Modal>
             )}

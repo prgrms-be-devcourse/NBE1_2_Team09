@@ -1,17 +1,19 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import axios from 'axios';
-import { useNavigate,useParams  } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Modal from 'react-modal';
 import PlaceDetail from './PlaceDetail';
 import './RecommendationSearch.css';
 
-function RecommendationSearch({eventId,onClose}) {
+function RecommendationSearch({ eventId, onClose }) {
     const [placeType, setPlaceType] = useState('establishment');
     const [sortOption, setSortOption] = useState('rating');
     const [places, setPlaces] = useState([]);
     const [selectedPlace, setSelectedPlace] = useState(null);
     const [selectedPlaceId, setSelectedPlaceId] = useState(null);
     const [isPlaceDetailOpen, setIsPlaceDetailOpen] = useState(false);
+    const [selectedMarker, setSelectedMarker] = useState(null); // 현재 선택된 마커 상태
+    const placeListRef = useRef(); // 목록에 대한 참조
 
     const fetchRecommendations = useCallback((type, sort) => {
         if (!eventId) {
@@ -43,8 +45,8 @@ function RecommendationSearch({eventId,onClose}) {
             center: center,
         });
 
-        placesData.forEach(place => {
-            new window.google.maps.Marker({
+        placesData.forEach((place, index) => {
+            const marker = new window.google.maps.Marker({
                 position: { lat: place.latitude, lng: place.longitude },
                 map: newMap,
                 icon: {
@@ -56,7 +58,30 @@ function RecommendationSearch({eventId,onClose}) {
                     scale: 13,
                 },
             });
+
+            const infowindow = new window.google.maps.InfoWindow({
+                content: `<div><strong>${place.name}</strong><br>평점: ${place.rating || 0}<br>리뷰 수: ${place.user_ratings_total}</div>`,
+            });
+    
+            marker.addListener('click', () => {
+                infowindow.open(newMap, marker);
+            });
+
+            // 마커 클릭 시 장소 정보 표시 및 목록으로 스크롤
+            marker.addListener('click', () => {
+                setSelectedMarker(place); // 클릭된 마커의 정보를 상태에 저장
+                scrollToPlace(index); // 해당 인덱스의 장소로 스크롤
+            });
         });
+    };
+
+    const scrollToPlace = (index) => {
+        if (placeListRef.current) {
+            const placeItem = placeListRef.current.children[index];
+            if (placeItem) {
+                placeItem.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        }
     };
 
     useEffect(() => {
@@ -73,10 +98,6 @@ function RecommendationSearch({eventId,onClose}) {
         fetchRecommendations(placeType, sort);
     };
 
-    const toggleSelection = (place) => {
-        setSelectedPlace(selectedPlace === place ? null : place);
-    };
-
     const handlePlaceClick = (placeId) => {
         setSelectedPlaceId(placeId);
         setIsPlaceDetailOpen(true); // PlaceDetail 모달 열기
@@ -86,7 +107,6 @@ function RecommendationSearch({eventId,onClose}) {
         setIsPlaceDetailOpen(false); // PlaceDetail 모달 닫기
     };
 
-
     const handleSelectionComplete = () => {
         if (!selectedPlace) {
             alert('선택된 장소가 없습니다.'); // 선택된 장소가 없을 경우 경고창 표시
@@ -94,7 +114,7 @@ function RecommendationSearch({eventId,onClose}) {
             console.log('선택된 장소:', selectedPlace);
 
             const locationData = {
-                placeId:selectedPlace.placeId,
+                placeId: selectedPlace.placeId,
                 placeName: selectedPlace.name,
                 latitude: selectedPlace.latitude,
                 longitude: selectedPlace.longitude,
@@ -108,10 +128,12 @@ function RecommendationSearch({eventId,onClose}) {
             sessionStorage.setItem('locationData', JSON.stringify(locationData));
 
             onClose(); // 모달 닫기
-            //navigate(-1); // 또는 navigate('/schedule-detail'); 로 이동
         }
     };
 
+    const handleMarkerClose = () => {
+        setSelectedMarker(null); // 마커 선택 해제
+    };
 
     return (
         <div className="recommendation-search" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
@@ -137,8 +159,8 @@ function RecommendationSearch({eventId,onClose}) {
                 </div>
             </div>
 
-            <div className="place-list" style={{ flex: 1, overflowY: 'auto' }}>
-                {places.map(place => (
+            <div className="place-list" style={{ flex: 1, overflowY: 'auto' }} ref={placeListRef}>
+                {places.map((place, index) => (
                     <div
                         key={place.placeId}
                         className={`place-item ${selectedPlace === place ? 'selected' : ''}`}
@@ -152,7 +174,10 @@ function RecommendationSearch({eventId,onClose}) {
                             <p>평점: {place.rating} | 리뷰 수: {place.user_ratings_total}</p>
                         </div>
                         <button
-                            onClick={(e) => { e.stopPropagation(); toggleSelection(place); }}
+                            onClick={(e) => {
+                                e.stopPropagation(); // 클릭 이벤트 전파 방지
+                                setSelectedPlace(place); // 장소 선택
+                            }}
                             className={`select-button-reco ${selectedPlace === place ? 'selected' : ''}`}
                         >
                             {selectedPlace === place ? '취소' : '선택'}
@@ -161,13 +186,13 @@ function RecommendationSearch({eventId,onClose}) {
                 ))}
             </div>
 
-            <button className="save-button" onClick={handleSelectionComplete}>
+            <button className="save-button" style={{ "margin-top": 0 }}onClick={handleSelectionComplete}>
                 선택 완료
             </button>
 
             {/* PlaceDetail 모달 */}
             {selectedPlaceId && (
-                <Modal isOpen={isPlaceDetailOpen} onRequestClose={handleClosePlaceDetail}  shouldCloseOnOverlayClick={false} className="modal-content" overlayClassName="modal-overlay">
+                <Modal isOpen={isPlaceDetailOpen} onRequestClose={handleClosePlaceDetail} shouldCloseOnOverlayClick={false} className="modal-content-detail" overlayClassName="modal-overlay">
                     <PlaceDetail placeId={selectedPlaceId} onClose={handleClosePlaceDetail} />
                 </Modal>
             )}

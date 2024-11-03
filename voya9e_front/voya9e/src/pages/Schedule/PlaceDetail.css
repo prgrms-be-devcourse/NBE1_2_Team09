@@ -10,7 +10,7 @@
 }
 
 /* 모달 콘텐츠 스타일 */
-.modal-content {
+.modal-content-detail {
     position: absolute;
     top: 50%; /* 화면의 중앙에 위치 */
     left: 50%;
@@ -28,16 +28,16 @@
 }
 
 /* 스크롤바 꾸미기 (선택사항) */
-.modal-content::-webkit-scrollbar {
+.modal-content-detail::-webkit-scrollbar {
     width: 6px;
 }
 
-.modal-content::-webkit-scrollbar-thumb {
+.modal-content-detail::-webkit-scrollbar-thumb {
     background-color: rgba(0, 0, 0, 0.3);
     border-radius: 3px;
 }
 
-.modal-content::-webkit-scrollbar-thumb:hover {
+.modal-content-detail::-webkit-scrollbar-thumb:hover {
     background-color: rgba(0, 0, 0, 0.5);
 }
 

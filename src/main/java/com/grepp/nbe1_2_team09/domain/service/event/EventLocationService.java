@@ -53,6 +53,7 @@ public class EventLocationService {
                 .description(req.description())
                 .visitStartTime(req.visitStartTime())
                 .visitEndTime(req.visitEndTime())
+                .color(req.color())
                 .build();
 
         EventLocation savedEventLocation = eventLocationRepository.save(eventLocation);

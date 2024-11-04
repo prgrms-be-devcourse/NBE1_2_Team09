@@ -36,15 +36,19 @@ public class EventLocation {
     @Column(nullable = false)
     private LocalDateTime visitEndTime;
 
+    @Column(nullable = false)
+    private String color;
+
     //기본 비즈니스 메서드
 
     @Builder
-    public EventLocation(Event event, Location location, String description, LocalDateTime visitStartTime, LocalDateTime visitEndTime) {
+    public EventLocation(Event event, Location location, String description, LocalDateTime visitStartTime, LocalDateTime visitEndTime, String color) {
         this.event = event;
         this.location = location;
         this.description = description;
         this.visitStartTime = visitStartTime;
         this.visitEndTime = visitEndTime;
+        this.color = color;
     }
 
     public void updateDescription(String description) {

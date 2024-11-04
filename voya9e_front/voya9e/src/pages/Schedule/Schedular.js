@@ -46,6 +46,7 @@ const Schedular = () => {
 
         const locationResponse = await fetch(`/events/${eventId}/locations`);
         const locationData = await locationResponse.json();
+         console.error('dsfs:',locationData)
         if (locationData) {
           const loadedEvents = locationData.map(location => ({
             id: location.pinId,
@@ -53,6 +54,7 @@ const Schedular = () => {
             start: DateTime.fromISO(location.visitStartTime).toISO(),
             end: DateTime.fromISO(location.visitEndTime).toISO(),
             extendedProps: { editable: true },
+            color:location.color
           }));
           setEvents(loadedEvents);
         }
@@ -125,6 +127,7 @@ const handleUpdatedSelection = (updatedData) => {
         title: savedCell.description,
         start: DateTime.fromISO(savedCell.visitStart).toISO(),
         end: DateTime.fromISO(savedCell.visitEnd).toISO(),
+        color:savedCell.color,
         extendedProps: { editable: true }
     };
     setEvents((prevEvents) => {

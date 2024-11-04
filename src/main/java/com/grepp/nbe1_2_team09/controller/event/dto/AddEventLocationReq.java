@@ -17,7 +17,9 @@ public record AddEventLocationReq(
         LocalDateTime visitStartTime,
 
         @NotNull(message = "방문 종료 시간 필수")
-        LocalDateTime visitEndTime
+        LocalDateTime visitEndTime,
+
+        String color
 
 ) {
     @AssertTrue(message = "방문 종료 시간은 시작 시간 이후여야 합니다.")

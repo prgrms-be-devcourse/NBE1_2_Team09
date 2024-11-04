@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import axios from 'axios';
-import { SketchPicker } from 'react-color';
 import { useNotification } from '../../context/NotificationContext';
 import Modal from 'react-modal';
 import AutoCompleteSearch from './AutoCompleteSearch';
@@ -11,7 +10,7 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
     const [description, setDescription] = useState('');
     const [locationData, setLocationData] = useState(null);
     const navigate = useNavigate();
-    const [color, setColor] = useState('#ff0000');
+    const [color, setColor] = useState('#008CFF');
     const { stompClient } = useNotification();
     const [isModalOpen, setIsModalOpen] = useState(false);
 
@@ -77,6 +76,7 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
                 description,
                 visitStartTime: startTime,
                 visitEndTime: endTime,
+                color
             };
             const eventLocationResponse = await axios.post(`/events/${eventId}/locations`, eventLocationReq);
             alert("일정이 저장되었습니다.");
@@ -92,6 +92,7 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
                 description: description,
                 visitStart: startTime,
                 visitEnd: endTime,
+                color
             };
             if (stompClient && stompClient.connected) {
                 stompClient.publish({
@@ -105,9 +106,9 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
             alert("저장 중 오류가 발생했습니다.");
         }
     };
-    // 색상 변경 핸들러
-    const handleColorChange = (color) => {
-        setColor(color.hex); // 선택된 색상 저장
+     // 색상 변경 핸들러
+     const handleColorChange = (event) => {
+        setColor(event.target.value); // 선택된 색상 저장
     };
 
     return (
@@ -143,10 +144,15 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="일정에 대한 설명을 입력하세요"
             />
-             {/* <SketchPicker 
-                color={color} 
-                onChangeComplete={handleColorChange} 
-            /> */}
+           <div className="color-picker" style={{ display: 'flex', alignItems: 'center' }}>
+                <p style={{ marginRight: '10px' }}>색상 선택:</p>
+                <input 
+                    type="color" 
+                    value={color} 
+                    onChange={handleColorChange} 
+                    style={{backgroundColor: color, width: '20px', height: '20px', border: 'none',borderRadius: '4px', cursor: 'pointer', marginRight: '10px' }} 
+                />
+            </div>
             <button className="save-button" onClick={handleSubmit}>저장</button>
 
             {/* 모달 컴포넌트에 eventId를 prop으로 전달 */}

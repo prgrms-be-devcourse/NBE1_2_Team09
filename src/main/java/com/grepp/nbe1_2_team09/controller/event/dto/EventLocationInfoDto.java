@@ -10,7 +10,8 @@ public record EventLocationInfoDto(
         LocationEventDto location,
         String description,
         LocalDateTime visitStartTime,
-        LocalDateTime visitEndTime
+        LocalDateTime visitEndTime,
+        String color
 ) {
     public static EventLocationInfoDto from(EventLocation eventLocation) {
         return new EventLocationInfoDto(
@@ -18,7 +19,8 @@ public record EventLocationInfoDto(
                 com.grepp.nbe1_2_team09.controller.location.dto.LocationEventDto.from(eventLocation.getLocation()),
                 eventLocation.getDescription(),
                 eventLocation.getVisitStartTime(),
-                eventLocation.getVisitEndTime()
+                eventLocation.getVisitEndTime(),
+                eventLocation.getColor()
         );
     }
 }

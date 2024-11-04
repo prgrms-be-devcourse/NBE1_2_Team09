@@ -18,7 +18,6 @@ import java.util.List;
 public class EventLocationController {
 
     private final EventLocationService eventLocationService;
-    private final RedisTemplate<String, String> eventLocationRedisTemplate;
 
     @PostMapping("/{eventId}/locations")
     public ResponseEntity<EventLocationDto> addLocationToEvent(
@@ -65,9 +64,7 @@ public class EventLocationController {
 
     @PostMapping("/api/unlockLocation")
     public ResponseEntity<Void> unlockLocation(@RequestBody UnlockLocationRequest request) {
-        Long pinId = request.pinId();
-        String lockKey = "lock:eventLocation:" + pinId;
-        eventLocationRedisTemplate.delete(lockKey); // 락 해제
+        eventLocationService.unlockLocation(request.pinId());
         return ResponseEntity.ok().build();
     }
 

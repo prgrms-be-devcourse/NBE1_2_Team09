@@ -59,7 +59,6 @@ public class EventLocationService {
         return EventLocationDto.from(savedEventLocation);
     }
 
-
     //일정에 포함된 장소 불러오기
     public List<EventLocationInfoDto> getEventLocations(Long eventId) {
         Event event = findEventByIdOrThrowEventException(eventId);
@@ -101,7 +100,6 @@ public class EventLocationService {
         return infos;
     }
 
-
     @Transactional
     public EventLocationDto updateEventLocation(Long pinId, UpdateEventLocationReq req) {
 
@@ -114,12 +112,10 @@ public class EventLocationService {
             eventLocation.updateVisitTime(req.visitStartTime(), req.visitEndTime());
         }
         // 수정 완료 후 락 해제
-        String lockKey = "lock:eventLocation:" + pinId;
-        eventLocationRedisTemplate.delete(lockKey);
+        unlockLocation(pinId);
 
         return EventLocationDto.from(eventLocation);
     }
-
 
     //일정에 포함된 장소 삭제
     @Transactional
@@ -129,6 +125,10 @@ public class EventLocationService {
         eventLocationRepository.delete(eventLocation);
     }
 
+    public void unlockLocation(Long pinId){
+        String lockKey = "lock:eventLocation:" + pinId;
+        eventLocationRedisTemplate.delete(lockKey); // 락 해제
+    }
 
     //예외 처리
     private Event findEventByIdOrThrowEventException(Long eventId) {

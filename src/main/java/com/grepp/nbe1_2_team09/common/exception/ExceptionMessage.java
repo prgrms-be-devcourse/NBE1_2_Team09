@@ -55,7 +55,6 @@ public enum ExceptionMessage {
 
     //EventLocation
     EVENT_LOCATION_LOCKED("락이 걸려있습니다. 다른 사용자가 수정중입니다.")
-
     ;
 
     private final String text;

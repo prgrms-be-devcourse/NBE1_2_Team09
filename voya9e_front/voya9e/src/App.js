@@ -36,7 +36,7 @@ import AddFinancialPlan from './pages/accountBook/AddFinancalPlan';
 import OtherExpenses from './pages/accountBook/OtherExpenses';
 import FinancalPlanDetail from './pages/accountBook/FinancalPlanDetail';
 import EmergencyFundInput from './pages/accountBook/EmergencyFundInput';
-import FinancialPlanDetailByItem from './pages/accountBook/\bFinancialPlanDetailByItem';
+import FinancialPlanDetailByItem from './pages/accountBook/FinancialPlanDetailByItem';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);

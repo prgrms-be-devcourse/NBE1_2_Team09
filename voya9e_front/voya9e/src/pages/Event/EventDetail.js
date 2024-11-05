@@ -47,7 +47,9 @@ const EventDetail = () => {
             alert('종료 날짜 선택 필수');
             return;
         }
-        
+        const Start = new Date(startDate);
+        Start.setDate(Start.getDate() + 1);
+        const Startdate = Start.toISOString();
 
         // API 호출
         const response = await fetch('/events', {
@@ -59,7 +61,7 @@ const EventDetail = () => {
                 eventName,
                 description,
                 city,
-                startDate,
+                startDate : Startdate,
                 endDate,
                 groupId,
             }),

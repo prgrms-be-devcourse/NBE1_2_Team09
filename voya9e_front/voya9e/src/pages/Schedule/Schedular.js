@@ -171,6 +171,7 @@ const handleUpdatedSelection = (updatedData) => {
 
  // 이벤트 클릭 시 수정페이지로
  const handleEventClick = async (clickInfo) => {
+  console.log("ddfsfsdfsf,",clickInfo.event.color)
   await fetchEventLocation(clickInfo.event.id, clickInfo.event.start, clickInfo.event.end);
 };
 
@@ -183,27 +184,6 @@ const handleEventDidMount = (eventInfo) => {
   
 };
 
-// const checkForOverlappingSelectedCell = (start, end, id) => {
-//   console.log("start,end", start, end);
-
-//   return events.some(event => {
-//     // 본인 이벤트는 무시
-//     if (event.id === id) return false;
-
-//     console.log("dfs",eventStart)
-
-//     const eventStart = new Date(event.start); // 이벤트 시작 시간
-//     const eventEnd = new Date(event.end); // 이벤트 종료 시간
-
-//     // 시간 겹치는지 확인
-//     const isTimeOverlapping = (start < eventEnd && end > eventStart);
-
-//     // 두 조건 중 하나라도 충족하면 true 반환
-//     return isTimeOverlapping;
-//   });
-// };
-
-
 // KST로 변환하여 ISO 문자열로 반환하는 함수
 const convertToISODate = (date) => {
   const kstOffset = 9 * 60 * 60 * 1000; // KST 오프셋 (9시간)
@@ -212,42 +192,39 @@ const convertToISODate = (date) => {
 };
 
 const handleEventChange = async (eventInfo) => {
-  // const { start, end, id } = eventInfo.event;
-  // // 선택된 셀과의 중복 확인
-  // if (checkForOverlappingSelectedCell(start,end,id)) {
-  //   console.log("여기로 들어가나요?")
-  //   eventInfo.revert();
-  //   return;
-  // }
-
   // 드래그 또는 리사이즈가 유효한 경우
   if (eventInfo.event.extendedProps.editable) {
-    console.log("왜 안되나요?")
-    await fetchEventLocation(eventInfo.event.id, eventInfo.event.start, eventInfo.event.end);
+    await fetchEventLocation(eventInfo.event.id, eventInfo.event.start, eventInfo.event.end,eventInfo.event.color);
   }
 };
 
+const handleOriginChange = async (info) => {
+  const startDateTime = convertToISODate(info.oldEvent.start);
+  const endDateTime = convertToISODate(info.oldEvent.end);
+
+  // 드롭 또는 리사이즈 직전의 원래 이벤트 정보 저장
+  const originalEventInfo = {
+    id: info.oldEvent.id,
+    title: info.oldEvent.title,
+    start: startDateTime,
+    end: endDateTime,
+    color: info.oldEvent.color,
+    extendedProps: { editable: true },
+  };
+  setOriginalEvent(originalEventInfo);
+};
+
 const handleEventDrop = async (dropInfo) => {
-  console.log("Dfs",dropInfo)
 
-  const startDateTime = convertToISODate(dropInfo.oldEvent.start);
-  const endDateTime = convertToISODate(dropInfo.oldEvent.end);
-
-    // 드롭 직전의 원래 이벤트 정보 저장
-    const originalEventInfo = {
-      id: dropInfo.oldEvent.id,
-      title: dropInfo.oldEvent.title,
-      start: startDateTime,
-      end: endDateTime,
-      extendedProps: { editable: true },
-    };
-  
-    setOriginalEvent(originalEventInfo);
+  handleOriginChange(dropInfo)
 
   await handleEventChange(dropInfo);
 };
 
 const handleEventResize = async (resizeInfo) => {
+
+  handleOriginChange(resizeInfo)
+
   await handleEventChange(resizeInfo);
 };
 
@@ -266,7 +243,7 @@ const fetchEventLocation = async (pinId, startTime, endTime) => {
       location: data.location,
       description: data.description,
       visitStartTime: startDateTime,
-      visitEndTime: endDateTime
+      visitEndTime: endDateTime,
     });
     setIsEditModalOpen(true); // 모달 열기
   } catch (error) {

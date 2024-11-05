@@ -10,7 +10,7 @@ function ExpenseDetail() {
 
   const { state } = location || {};
   const { expenseId } = state || {}; // state에서 expenseId를 받아옴
-  const { groupId } = useParams(); 
+  const { eventId } = useParams(); 
 
 
   const [errorMessage, setErrorMessage] = useState('');
@@ -72,11 +72,11 @@ function ExpenseDetail() {
   }
 
   const handleAccountBook = () => {
-    navigate(`/accountBook/${groupId}`);
+    navigate(`/accountBook/${eventId}`);
   };
 
   const handleEditAccount = (expenseId) => {
-    navigate(`/accountBook/${groupId}/edit`, { state: { expenseId } });
+    navigate(`/accountBook/${eventId}/edit`, { state: { expenseId } });
   };
   
 

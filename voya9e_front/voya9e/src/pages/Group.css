@@ -162,18 +162,18 @@
     font-size: 20px;
 }
 
-.expenseBookBtn{
-    margin-top: 40px;
-    width: 100%; /* 인풋과 동일한 너비 설정 */
-    padding: 0.5rem;
+.expenseBookBtn {
+    padding: 5px 10px; /* 버튼 크기 조정 */
+    margin-left: 50px;
+    font-size: 0.8rem; /* 글씨 크기 조정 */
+    border-radius: 4px; /* 버튼의 둥근 모서리 */
     background-color: #008CFF;
     color: white;
-    border: none;
-    border-radius: 5px;
-    font-size: 1rem;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
+  }
+  
+  .expenseBookBtn:hover {
+    background-color: #006bbf; /* 호버 시 배경색 변경 */
+  }
 
 .notification-container {
     max-width: 600px;

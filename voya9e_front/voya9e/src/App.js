@@ -31,6 +31,12 @@ import PlaceDetail from './pages/Schedule/PlaceDetail';
 import Calendar from './pages/Event/Calendar';
 import EventDetail from './pages/Event/EventDetail';
 import { isAuthenticated } from './services/api';
+import FinancialPlan from './pages/accountBook/FinancalPlan';
+import AddFinancialPlan from './pages/accountBook/AddFinancalPlan';
+import OtherExpenses from './pages/accountBook/OtherExpenses';
+import FinancalPlanDetail from './pages/accountBook/FinancalPlanDetail';
+import EmergencyFundInput from './pages/accountBook/EmergencyFundInput';
+import FinancialPlanDetailByItem from './pages/accountBook/\bFinancialPlanDetailByItem';
 
 const App = () => {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -55,11 +61,11 @@ const App = () => {
           <Route path="/update-profile" element={<UpdateProfilePage />} />
           <Route path="/change-password" element={<ChangePasswordPage />} />
           <Route path="/delete-account" element={<DeleteAccountPage setLoggedIn={setLoggedIn} />} />
-          <Route path="/accountBook/:groupId" element={<AccountBook />} />
-          <Route path="/accountBook/:groupId/addExpense" element={<AddExpense/>}/>
-          <Route path="/expense/:groupId" element={<ExpenseDetail />} />
-          <Route path="/accountBook/:groupId/edit" element={<EditExpense />} />
-          <Route path="/accountBook/:groupId/receipt/add" element={<AddReceiptExpense />} />
+          <Route path="/accountBook/:eventId" element={<AccountBook />} />
+          <Route path="/accountBook/:eventId/addExpense" element={<AddExpense/>}/>
+          <Route path="/expense/:eventId" element={<ExpenseDetail />} />
+          <Route path="/accountBook/:eventId/edit" element={<EditExpense />} />
+          <Route path="/accountBook/:eventId/receipt/add" element={<AddReceiptExpense />} />
           <Route path="/exchange-rate" element={<ExchangeRate />} />
           <Route path='/chat' element={<Chat />}/>
           <Route path="/groups" element={<GroupList />} />
@@ -75,6 +81,12 @@ const App = () => {
           <Route path="/recommended/:eventId" element={<RecommendedSearchPage />} />
           <Route path="/places/:placeId" element={<PlaceDetail />} />
           <Route path="/eventdetail/:groupId" element={<EventDetail />} />
+          <Route path='/financial-plan/:eventId' element={<FinancialPlan/>}/>
+          <Route path="/financial-plan/:eventId/add" element={<AddFinancialPlan />} />
+          <Route path="/financial-plan/:eventId/others" element={<OtherExpenses />} />
+          <Route path="/financial-plan/:eventId/detail/:financialPlanId" element={<FinancalPlanDetail />} />
+          <Route path="/emergency-fund-input/:eventId" element={<EmergencyFundInput />} />
+          <Route path="/financial-plan/:eventId/expenses/:itemName" element={<FinancialPlanDetailByItem />} />
         </Routes>
       </NotificationProvider>
   );

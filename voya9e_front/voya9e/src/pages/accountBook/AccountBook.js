@@ -22,25 +22,7 @@ function AccountBook() {
 
     let URL = "";
 
-    const { groupId } = useParams(); // URL 파라미터에서 groupId를 가져옴
-
-    // // 지출 목록과 총액 상태 관리 (서버 연결 테스트용)
-    // const [expenses, setExpenses] = useState([
-    //     {
-    //         expensesId: 1,
-    //         expensesDate: "2024-09-24T09:54:22",
-    //         itemName: "식비",
-    //         amount: 1000,
-    //         paidByUserId: "유저1"
-    //     },
-    //     {
-    //         expensesId: 2,
-    //         expensesDate: "2024-09-24T11:00:00",
-    //         itemName: "교통비",
-    //         amount: 3500,
-    //         paidByUserId: "유저2"
-    //     }
-    // ]); // 초기 테스트 데이터
+    const { eventId } = useParams(); // URL 파라미터에서 groupId를 가져옴
 
     // 서버 연결을 위한 실제 초기값 설정 (빈 배열)
     const [expenses, setExpenses] = useState([]); // 서버 연결 시 사용
@@ -52,7 +34,7 @@ function AccountBook() {
       // 서버에서 지출 데이터를 가져오는 함수
       const fetchExpenses = async () => {
           try {
-              const response = await axios.get(`/accountBook/${groupId}`); // groupId에 따른 API 요청
+              const response = await axios.get(`/accountBook/${eventId}`); // groupId에 따른 API 요청
               const expensesData = response.data;
               setExpenses(expensesData);
   
@@ -65,7 +47,7 @@ function AccountBook() {
       };
   
       fetchExpenses(); // 컴포넌트가 마운트될 때 실행
-  }, [groupId]);
+  }, [eventId]);
   
   // 지출 총액 계산 함수
   useEffect(() => {
@@ -76,13 +58,13 @@ function AccountBook() {
       }
   }, [expenses]); // expenses가 변경될 때마다 totalAmount 업데이트
 
-    const handleAddExpense = (groupId) => {
+    const handleAddExpense = (eventId) => {
         // 그룹을 선택하면 /accountBook/{groupId}로 이동
-        navigate(`/accountBook/${groupId}/addExpense`);
+        navigate(`/accountBook/${eventId}/addExpense`);
     };
 
     const handleItemClick = (expenseId) => {
-      navigate(`/expense/${groupId}`, { state: { expenseId: expenseId } }); // groupId는 useParams로 가져온 값을 사용
+      navigate(`/expense/${eventId}`, { state: { expenseId: expenseId } }); // groupId는 useParams로 가져온 값을 사용
   };
   
 
@@ -108,6 +90,7 @@ function AccountBook() {
 
                 <div className="d-flex justify-content-center mt-4">
                     <div className="col-md-6 d-flex justify-content-end" style={{ gap: '20px' }}>
+                    <button className="btn" onClick={() => navigate(`/financial-plan/${eventId}`)}>계획 관리</button>
                         <button className="btn" onClick={openPopup}>
                             영수증으로 추가하기 +
                         </button>
@@ -116,8 +99,7 @@ function AccountBook() {
                         {isPopupOpen && (
                             <AddReceiptPopup onClose={closePopup}/>
                         )}
-                        
-                        <button className="btn" onClick={() => handleAddExpense(groupId)}>
+                        <button className="btn" onClick={() => handleAddExpense(eventId)}>
                             추가하기 +
                         </button>
                     </div>

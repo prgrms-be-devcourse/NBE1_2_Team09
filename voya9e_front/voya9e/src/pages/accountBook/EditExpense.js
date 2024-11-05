@@ -8,7 +8,7 @@ function EditExpense() {
   const location = useLocation();
   const navigate = useNavigate();
   const { state } = location || {};
-  const { groupId } = useParams(); 
+  const { eventId } = useParams(); 
   const { expenseId } = state || {};
 
   const [expenseDetail, setExpenseDetail] = useState({
@@ -93,7 +93,7 @@ function EditExpense() {
 
       if (response.status === 200) {
         alert("지출 정보가 성공적으로 수정되었습니다.");
-        navigate(`/accountBook/${groupId}`); // 수정 후 목록 페이지로 이동
+        navigate(`/accountBook/${eventId}`); // 수정 후 목록 페이지로 이동
       }
     } catch (error) {
       console.error("지출 정보 수정 중 오류 발생:", error);
@@ -113,7 +113,7 @@ function EditExpense() {
 
       if (response.status === 200) {
         alert("지출 정보가 성공적으로 삭제되었습니다.");
-        navigate(`/accountBook/${groupId}`); // 수정 후 목록 페이지로 이동
+        navigate(`/accountBook/${eventId}`); // 수정 후 목록 페이지로 이동
       }
     } catch (error) {
       console.error("지출 정보 삭제 중 오류 발생:", error);

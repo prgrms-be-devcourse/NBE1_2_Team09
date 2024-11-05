@@ -7,7 +7,7 @@ import axios from 'axios';
 function AddReceiptPopup({ onClose, onSuccess }) {
   const [selectedFile, setSelectedFile] = useState(null);
   const [errorMessage, setErrorMessage] = useState('');
-  const { groupId } = useParams(); 
+  const { eventId } = useParams(); 
   const navigate = useNavigate();
 
   // 파일 선택 핸들러
@@ -38,7 +38,7 @@ function AddReceiptPopup({ onClose, onSuccess }) {
         });
 
         if (response.status === 200) {
-            navigate(`/accountBook/${groupId}/receipt/add`, { state: { data: response.data } }); // 처리된 데이터를 새로운 페이지로 전달
+            navigate(`/accountBook/${eventId}/receipt/add`, { state: { data: response.data } }); // 처리된 데이터를 새로운 페이지로 전달
             // 성공적으로 처리된 데이터를 콜백 함수에 전달
           // await onSuccess(response.data);
           onSuccess(base64String);

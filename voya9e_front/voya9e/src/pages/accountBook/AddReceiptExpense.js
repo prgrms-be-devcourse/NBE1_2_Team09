@@ -6,7 +6,7 @@ import './accountBook.css';
 function AddReceiptExpense() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { groupId } = useParams(); // URL에서 groupId를 가져옴
+  const { eventId } = useParams(); // URL에서 groupId를 가져옴
   const { state } = location || {};
   
   const [data, setData] = useState(state?.data || null);
@@ -49,7 +49,7 @@ function AddReceiptExpense() {
       if (response.status === 200) {
         const formattedData = response.data;
         // 포맷팅된 데이터를 새로운 페이지로 전달
-        navigate(`/accountBook/${groupId}/addExpense`, { state: { ...formattedData } });
+        navigate(`/accountBook/${eventId}/addExpense`, { state: { ...formattedData } });
       }
     } catch (error) {
       console.error('포맷팅 중 오류 발생:', error);

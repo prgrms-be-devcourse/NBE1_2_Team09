@@ -6,13 +6,12 @@ import Modal from 'react-modal';
 import AutoCompleteSearch from './AutoCompleteSearch';
 import './ScheduleUpdate.css';
 
-const ScheduleUpdate = ({ pinId, location, description, visitStartTime, visitEndTime, onClose }) => {
+const ScheduleUpdate = ({ pinId, location, description, visitStartTime, visitEndTime ,onClose }) => {
     const [eventDescription, setEventDescription] = useState(description || ''); // 외부에서 받은 description 초기화
     const [locationData, setLocationData] = useState(location || null); // 외부에서 받은 location 초기화
     const { stompClient } = useNotification();
 
     const handleUpdate = async () => {
-        console.log("1111111111",pinId)
         const updateRequest = {
             description: eventDescription,
             visitStartTime,
@@ -29,7 +28,7 @@ const ScheduleUpdate = ({ pinId, location, description, visitStartTime, visitEnd
                 pinId: response.data.pinId,
                 description: eventDescription,
                 visitStart: visitStartTime,
-                visitEnd: visitEndTime,
+                visitEnd: visitEndTime
             };
             if (stompClient && stompClient.connected) {
                 stompClient.publish({
@@ -68,8 +67,6 @@ const ScheduleUpdate = ({ pinId, location, description, visitStartTime, visitEnd
         }
     };
     const handleBackButton = async () => {
-        console.log("pinId!!!:", pinId); // pinId 값을 콘솔에 출력하여 확인
-    
         try {
             await fetch('/events/api/unlockLocation', {
                 method: 'POST',

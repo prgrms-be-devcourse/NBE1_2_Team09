@@ -1,5 +1,5 @@
 .schedular-container {
-  width: 90%; /* 너비를 80%로 설정 */
+  width: 100%; /* 너비를 80%로 설정 */
   height: 100vh; /* 화면 전체 높이 */
   margin: 0 auto; /* 가운데 정렬 */
 }
@@ -14,4 +14,13 @@
 
 .fc-direction-ltr {
   height: 100%; /* 좌에서 우로 방향을 설정할 경우 높이 조정 */
+}
+.fc-header-toolbar {
+  font-size: 15px; /* 헤더의 글자 크기 */
+  padding: 10px; /* 헤더의 패딩 */
+}
+
+.fc-button {
+  font-size: 8px; /* 버튼의 글자 크기 */
+  padding: 5px 10px; /* 버튼의 패딩 */
 }

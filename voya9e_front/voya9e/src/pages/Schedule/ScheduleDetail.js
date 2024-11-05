@@ -103,7 +103,7 @@ const ScheduleDetail = ({ startTime, endTime, eventId, onClose }) => {
 
         } catch (error) {
             console.error("오류 발생:", error);
-            alert("저장 중 오류가 발생했습니다.");
+            alert("해당 시간대는 이미 예약되어 있습니다.");
         }
     };
      // 색상 변경 핸들러

@@ -250,24 +250,27 @@ const GroupMembers = () => {
                 <h2>일정 목록</h2>
                 <button className='groupBtn' onClick={handleAddEvent} style={{ marginLeft: '10px' }} disabled={actionLoading}>일정 추가하기</button>
                 <ul>
-                    {events.length > 0 ? (
-                        events.map(event => (
-                            <li className='groupMemberLi' key={event.id}>
-                                {event.eventName} <br /> {event.city} <br /> {event.startDate + "~" + event.endDate}
-                                <button 
-                                    className='expenseBookBtn' 
-                                    onClick={() => handleAccountBook(event.id)} 
-                                    style={{ marginLeft: '10px' }} 
-                                    disabled={actionLoading}
-                                >
-                                    가계부
-                                </button>
-                            </li>
-                        ))
-                    ) : (
-                        <li className='groupMemberLi'>등록된 일정이 없습니다.</li>
-                    )}
-                </ul>
+    {events.length > 0 ? (
+        events.map(event => (
+            <li className='groupMemberLi' key={event.id} onClick={() => handleAddSchedule(event.id)}>
+                {event.eventName} <br /> {event.city} <br /> {event.startDate + "~" + event.endDate}
+                <button 
+                    className='expenseBookBtn' 
+                    onClick={(e) => {
+                        e.stopPropagation(); // 이벤트 버블링 중지
+                        handleAccountBook(event.id);
+                    }} 
+                    style={{ marginLeft: '10px' }} 
+                    disabled={actionLoading}
+                >
+                    가계부
+                </button>
+            </li>
+        ))
+    ) : (
+        <li className='groupMemberLi'>등록된 일정이 없습니다.</li>
+    )}
+</ul>
             </div>
         </div>
     );

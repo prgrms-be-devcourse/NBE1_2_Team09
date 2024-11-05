@@ -26,6 +26,8 @@
     z-index: 1003; /* 오버레이 위에 위치 */
     outline: none; /* 포커스 시 테두리 제거 */
     overflow: hidden; /* 모달 내부의 오버플로우 숨김 */
+    overflow: auto; /* 모달 내부 스크롤 가능 */
+    max-height: 80vh; /* 최대 높이 설정 */
 }
 .recommendation-search {
     width: 100%;

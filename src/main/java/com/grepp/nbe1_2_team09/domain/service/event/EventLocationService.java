@@ -2,6 +2,7 @@ package com.grepp.nbe1_2_team09.domain.service.event;
 
 import com.grepp.nbe1_2_team09.common.exception.ExceptionMessage;
 import com.grepp.nbe1_2_team09.common.exception.exceptions.EventException;
+import com.grepp.nbe1_2_team09.common.exception.exceptions.EventLocationException;
 import com.grepp.nbe1_2_team09.common.exception.exceptions.LocationException;
 import com.grepp.nbe1_2_team09.controller.event.dto.AddEventLocationReq;
 import com.grepp.nbe1_2_team09.controller.event.dto.EventLocationDto;
@@ -27,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -46,6 +48,11 @@ public class EventLocationService {
     public EventLocationDto addLocationToEvent(Long eventId, AddEventLocationReq req) {
         Event event = findEventByIdOrThrowEventException(eventId);
         Location location = findLocationByIdOrThrowLocationException(req.locationId());
+
+        // 저장할 때 겹치는 시간대 체크
+        if (eventLocationRepository.existsByEventIdAndVisitTimes(eventId, req.visitStartTime(), req.visitEndTime())) {
+            throw new EventLocationException(ExceptionMessage.UNAVAILABLE_TIME);
+        }
 
         EventLocation eventLocation = EventLocation.builder()
                 .event(event)
@@ -80,10 +87,9 @@ public class EventLocationService {
 
         // Redis에서 락을 확인 후 설정
         if (Boolean.FALSE.equals(eventLocationRedisTemplate.opsForValue().setIfAbsent(lockKey, "LOCKED", Duration.ofMinutes(1)))) {
-            throw new EventException(ExceptionMessage.EVENT_LOCATION_LOCKED);
+            throw new EventLocationException(ExceptionMessage.EVENT_LOCATION_LOCKED);
         }
 
-        // 일정 조회 로직
         EventLocation eventLocation = findEventLocationByIdOrThrowException(pinId);
         return EventLocationInfoDto.from(eventLocation);
     }

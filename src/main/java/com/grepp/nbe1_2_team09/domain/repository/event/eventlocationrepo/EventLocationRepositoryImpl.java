@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RequiredArgsConstructor
@@ -39,5 +40,16 @@ public class EventLocationRepositoryImpl implements EventLocationRepositoryCusto
                         .and(formattedDate.eq(date.toString()))) // LocalDate를 문자열로 변환하여 비교
                 .orderBy(eventLocation.visitStartTime.asc())
                 .fetch();
+    }
+
+    @Override
+    public boolean existsByEventIdAndVisitTimes(Long eventId, LocalDateTime visitStartTime, LocalDateTime visitEndTime) {
+        QEventLocation eventLocation = QEventLocation.eventLocation;
+
+        return queryFactory.selectFrom(eventLocation)
+                .where(eventLocation.event.eventId.eq(eventId)
+                        .and(eventLocation.visitStartTime.lt(visitEndTime))
+                        .and(eventLocation.visitEndTime.gt(visitStartTime)))
+                .fetchOne() != null;
     }
 }

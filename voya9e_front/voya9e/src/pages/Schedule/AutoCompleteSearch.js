@@ -46,13 +46,12 @@ function AutoCompleteSearch({onClose}) {
             axios.get(`/api/locations/${selectedPlace.placeId}`)
                 .then(response => {
                     const placeDetail = response.data;
-
                     const locationData = {
-                        placeId:placeDetail.place_id,
+                        placeId:placeDetail.placeId,
                         placeName: placeDetail.name,
                         latitude: placeDetail.latitude,
                         longitude: placeDetail.longitude,
-                        address: placeDetail.formatted_address,
+                        address: placeDetail.formattedAddress,
                         rating: placeDetail.rating || 0,
                         photo: placeDetail.photoUrl
                     };
